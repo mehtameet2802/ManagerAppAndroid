@@ -49,7 +49,7 @@
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/manager-app.git
+git clone https://github.com/mehtameet2802/ManagerAppAndroid.git
 ```
 
 2. Open the project in Android Studio

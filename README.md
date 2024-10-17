@@ -17,14 +17,11 @@
   - Add, update, and search for items in the inventory with ease
   - Real-time inventory tracking
   - Low stock alerts
-  - Bulk import/export capabilities
+  - File import/export capabilities
 
 - **Transaction Processing**
 
   - Efficiently process transactions for sales and purchases
-  - Barcode scanning support
-  - Multiple payment method support
-  - Receipt generation
 
 - **Transaction History**
   - Access transaction history and download it in PDF format
@@ -74,24 +71,7 @@ git clone https://github.com/yourusername/manager-app.git
 2. Enable Authentication and Firestore in your Firebase console
 3. Update the necessary API keys in `local.properties`
 
-## Contributing
-
-1. Fork the repository
-2. Create a new branch for your feature
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Contact
-
-For support or queries, please contact us at support@managerapp.com
-
 ## Acknowledgments
 
 - Firebase team for the excellent backend services
 - Android Jetpack team for amazing development components
-- All contributors who have helped to improve this project

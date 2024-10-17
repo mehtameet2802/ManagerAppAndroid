@@ -29,6 +29,8 @@ class ItemAdapter(
 
                 if (currentItem.min_quantity!! > currentItem.item_stock!!)
                     tvAmount.setTextColor(Color.RED)
+                else
+                    tvAmount.setTextColor(Color.BLACK)
 
                 var updateStock = currentItem.item_stock!!
                 btnInc.setOnClickListener {

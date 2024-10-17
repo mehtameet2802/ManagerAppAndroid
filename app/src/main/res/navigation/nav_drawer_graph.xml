@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.managerapp.ui.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_addItemFragment2"
+            app:destination="@id/addItemFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_transactionFragment"
+            app:destination="@id/transactionFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_transactionHistoryFragment"
+            app:destination="@id/transactionHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_inventoryStatusFragment"
+            app:destination="@id/inventoryStatusFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_uploadFileFragment"
+            app:destination="@id/uploadFileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addItemFragment"
+        android:name="com.example.managerapp.ui.fragments.AddItemFragment"
+        android:label="fragment_add_item"
+        tools:layout="@layout/fragment_add_item" >
+        <action
+            android:id="@+id/action_addItemFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/transactionFragment"
+        android:name="com.example.managerapp.ui.fragments.TransactionFragment"
+        android:label="fragment_transaction"
+        tools:layout="@layout/fragment_transaction">
+        <action
+            android:id="@+id/action_transactionFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_transactionFragment_to_transactionHistoryFragment"
+            app:destination="@id/transactionHistoryFragment" />
+        <action
+            android:id="@+id/action_transactionFragment_to_uploadFileFragment"
+            app:destination="@id/uploadFileFragment" />
+        <action
+            android:id="@+id/action_transactionFragment_to_inventoryStatusFragment"
+            app:destination="@id/inventoryStatusFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/transactionHistoryFragment"
+        android:name="com.example.managerapp.ui.fragments.TransactionHistoryFragment"
+        android:label="fragment_transaction_history"
+        tools:layout="@layout/fragment_transaction_history">
+        <action
+            android:id="@+id/action_transactionHistoryFragment_to_uploadFileFragment"
+            app:destination="@id/uploadFileFragment" />
+        <action
+            android:id="@+id/action_transactionHistoryFragment_to_inventoryStatusFragment"
+            app:destination="@id/inventoryStatusFragment" />
+        <action
+            android:id="@+id/action_transactionHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_transactionHistoryFragment_to_transactionFragment"
+            app:destination="@id/transactionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/uploadFileFragment"
+        android:name="com.example.managerapp.ui.fragments.UploadFileFragment"
+        android:label="fragment_upload_file"
+        tools:layout="@layout/fragment_upload_file">
+        <action
+            android:id="@+id/action_uploadFileFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_uploadFileFragment_to_inventoryStatusFragment"
+            app:destination="@id/inventoryStatusFragment" />
+        <action
+            android:id="@+id/action_uploadFileFragment_to_transactionFragment"
+            app:destination="@id/transactionFragment" />
+        <action
+            android:id="@+id/action_uploadFileFragment_to_transactionHistoryFragment"
+            app:destination="@id/transactionHistoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inventoryStatusFragment"
+        android:name="com.example.managerapp.ui.fragments.InventoryStatusFragment"
+        android:label="fragment_inventory_status"
+        tools:layout="@layout/fragment_inventory_status">
+        <action
+            android:id="@+id/action_inventoryStatusFragment_to_uploadFileFragment"
+            app:destination="@id/uploadFileFragment" />
+        <action
+            android:id="@+id/action_inventoryStatusFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_inventoryStatusFragment_to_transactionHistoryFragment"
+            app:destination="@id/transactionHistoryFragment" />
+        <action
+            android:id="@+id/action_inventoryStatusFragment_to_transactionFragment"
+            app:destination="@id/transactionFragment" />
+    </fragment>
+</navigation>

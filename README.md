@@ -61,7 +61,7 @@ git clone https://github.com/mehtameet2802/ManagerAppAndroid.git
 ## Requirements
 
 - Android Studio Arctic Fox or later
-- Minimum SDK: Android 21 (Lollipop)
+- Minimum SDK: Android 24
 - Target SDK: Android 34
 - Kotlin version: 1.8.0 or later
 

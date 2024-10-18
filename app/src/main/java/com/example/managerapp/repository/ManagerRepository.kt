@@ -55,7 +55,7 @@ class ManagerRepository {
         return firebaseDb
             .collection("users")
             .document(userId)
-            .collection("items")
+            .collection("transactions")
             .document(transId)
             .update(mapOf(Pair("transaction_id", transId)))
     }

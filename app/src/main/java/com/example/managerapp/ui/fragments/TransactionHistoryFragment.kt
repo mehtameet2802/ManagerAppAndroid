@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.managerapp.R
 import com.example.managerapp.databinding.FragmentTransactionHistoryBinding
 import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.utils.Resource
@@ -47,6 +49,14 @@ class TransactionHistoryFragment : Fragment() {
         var startDate = ""
         var endDate = ""
 
+        val btnClear = requireActivity().findViewById<ImageButton>(R.id.customIcon)
+
+        btnClear.setOnClickListener {
+            startDate = ""
+            endDate = ""
+            clearFields()
+        }
+
         binding.datesBtn.setOnClickListener {
             val picker = MaterialDatePicker.Builder.dateRangePicker()
                 .setTitleText("Select Date Range")
@@ -74,7 +84,14 @@ class TransactionHistoryFragment : Fragment() {
             viewModel.getTransactionHistory(user.uid,startDate,endDate)
         }
 
+
+
         observeTransactionHistory()
+    }
+
+    private fun clearFields() {
+        binding.tvStartDate.setText("")
+        binding.tvEndDate.setText("")
     }
 
     private fun observeTransactionHistory() {

@@ -81,7 +81,8 @@ class TransactionHistoryFragment : Fragment() {
         binding.downloadBtn.setOnClickListener {
             if(startDate.isEmpty() && endDate.isEmpty())
                 Toast.makeText(requireContext(),"Select start and end date",Toast.LENGTH_LONG).show()
-            viewModel.getTransactionHistory(user.uid,startDate,endDate)
+            else
+                viewModel.getTransactionHistory(user.uid,startDate,endDate)
         }
 
 

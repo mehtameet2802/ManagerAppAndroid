@@ -1,12 +1,15 @@
 package com.example.managerapp.ui.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,8 +31,8 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
     lateinit var binding: FragmentHomeBinding
     lateinit var viewModel: ManagerViewModel
     private lateinit var rvAdapter: ItemAdapter
-    private lateinit var user:FirebaseUser
-    private lateinit var items:List<Item>
+    private lateinit var user: FirebaseUser
+    private lateinit var items: List<Item>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,27 +51,38 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
         val btnDownload = requireActivity().findViewById<ImageButton>(R.id.customIcon)
 
         items = emptyList()
-        rvAdapter = ItemAdapter(items,this)
+        rvAdapter = ItemAdapter(items, this)
         binding.rvHome.layoutManager = LinearLayoutManager(context)
         binding.rvHome.adapter = rvAdapter
 
         user = viewModel.getCurrentUser()!!
 
         btnDownload.setOnClickListener {
-            if(items.isEmpty())
-                Toast.makeText(requireActivity(),"No items found",Toast.LENGTH_LONG).show()
-            else{
-                Toast.makeText(requireActivity(),"Downloading File",Toast.LENGTH_LONG).show()
-                viewModel.generateInventoryPdf("Current Inventory",items,"CurrentInventory")
+            if (items.isEmpty())
+                Toast.makeText(requireActivity(), "No items found", Toast.LENGTH_LONG).show()
+            else {
+                Toast.makeText(requireActivity(), "Downloading File", Toast.LENGTH_LONG).show()
+                viewModel.generateInventoryPdf("Current Inventory", items, "CurrentInventory")
             }
         }
+
+
+        binding.svHome.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                rvAdapter.filter.filter(s?.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         observeItemsResult()
     }
 
-    override fun onUpdateStock(item: Item, newStock:Int) {
+    override fun onUpdateStock(item: Item, newStock: Int) {
 
-        viewModel.updateItemStock(user.uid,item.item_id!!,newStock)
+        viewModel.updateItemStock(user.uid, item.item_id!!, newStock)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -77,7 +91,8 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
                         is Resource.Error -> {
                             binding.progressBar.visibility = View.GONE
                             println("update stock error ========= ")
-                            Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG)
+                                .show()
                         }
 
                         is Resource.Loading -> {
@@ -87,6 +102,7 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
                         is Resource.StandBy -> {
                             binding.progressBar.visibility = View.INVISIBLE
                         }
+
                         is Resource.Success -> {
                             println("stock updated successfully ========= ")
                             binding.progressBar.visibility = View.GONE

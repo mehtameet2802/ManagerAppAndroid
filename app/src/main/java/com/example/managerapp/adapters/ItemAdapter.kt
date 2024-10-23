@@ -4,16 +4,22 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.managerapp.R
 import com.example.managerapp.models.Item
+import java.util.logging.LogRecord
 
 class ItemAdapter(
-    private var itemList:List<Item>,
+    itemList:List<Item>,
     private val listener: OnItemInteractionListener
-):RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+):RecyclerView.Adapter<ItemAdapter.ItemViewHolder>(),Filterable {
+
+    private var originalList:List<Item> = itemList.toList()
+    private var filteredList:List<Item> = itemList.toList()
 
     inner class ItemViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
 
@@ -60,15 +66,43 @@ class ItemAdapter(
     }
 
     override fun getItemCount(): Int {
-        return itemList.size
+        return filteredList.size
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(itemList[position])
+        holder.bind(filteredList[position])
     }
 
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val query = constraint?.toString()?.trim()?.lowercase()?:""
+                filteredList = if(query.isEmpty()){
+                    originalList
+                } else{
+                    originalList.filter { item ->
+                        item.item_name?.lowercase()?.contains(query) == true
+                    }
+                }
+
+                return FilterResults().apply {
+                    values = filteredList
+                }
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                @Suppress("UNCHECKED_CAST")
+                filteredList = results?.values as List<Item>
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+
+
     fun updateItems(newItems:List<Item>){
-        itemList = newItems
+        originalList = newItems.toList()
+        filteredList = newItems.toList()
         notifyDataSetChanged()
     }
 

@@ -68,8 +68,8 @@ class TransactionHistoryFragment : Fragment() {
                 startDate = (it.first/1000).toString()
                 endDate = (it.second/1000).toString()
 
-                binding.tvStartDate.setText(convertTimeToDate(it.first))
-                binding.tvEndDate.setText(convertTimeToDate(it.second))
+                binding.tvStartDate.setText(viewModel.convertTimeToDate(it.first))
+                binding.tvEndDate.setText(viewModel.convertTimeToDate(it.second))
                 Log.d("HistoryFragment",it.toString())
             }
 
@@ -120,22 +120,16 @@ class TransactionHistoryFragment : Fragment() {
                             binding.progressBar.visibility = View.GONE
                             if(resource.data!!.isEmpty())
                                 Toast.makeText(requireContext(),"No Transactions Found",Toast.LENGTH_LONG).show()
-                            else
+                            else{
                                 Toast.makeText(requireContext(),"Downloading Transaction",Toast.LENGTH_LONG).show()
+                                viewModel.generateTransactionPdf(resource.data)
+                            }
                         }
                     }
 
                 }
             }
         }
-    }
-
-    private fun convertTimeToDate(time: Long):String {
-        val ist = Calendar.getInstance(TimeZone.getTimeZone("Asia/Kolkata"))
-        ist.timeInMillis = time
-        val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        format.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
-        return format.format(ist.time)
     }
 
 }

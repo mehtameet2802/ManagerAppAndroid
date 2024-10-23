@@ -5,11 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.managerapp.R
 import com.example.managerapp.adapters.ItemAdapter
 import com.example.managerapp.adapters.OnItemInteractionListener
 import com.example.managerapp.databinding.FragmentHomeBinding
@@ -18,6 +20,7 @@ import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment(), OnItemInteractionListener {
@@ -26,6 +29,7 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
     lateinit var viewModel: ManagerViewModel
     private lateinit var rvAdapter: ItemAdapter
     private lateinit var user:FirebaseUser
+    private lateinit var items:List<Item>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,11 +45,23 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
 
         viewModel = (activity as ManagerActivity).viewModel
 
-        rvAdapter = ItemAdapter(emptyList(),this)
+        val btnDownload = requireActivity().findViewById<ImageButton>(R.id.customIcon)
+
+        items = emptyList()
+        rvAdapter = ItemAdapter(items,this)
         binding.rvHome.layoutManager = LinearLayoutManager(context)
         binding.rvHome.adapter = rvAdapter
 
         user = viewModel.getCurrentUser()!!
+
+        btnDownload.setOnClickListener {
+            if(items.isEmpty())
+                Toast.makeText(requireActivity(),"No items found",Toast.LENGTH_LONG).show()
+            else{
+                Toast.makeText(requireActivity(),"Downloading File",Toast.LENGTH_LONG).show()
+                viewModel.generateInventoryPdf("Current Inventory",items,"CurrentInventory")
+            }
+        }
 
         observeItemsResult()
     }
@@ -109,7 +125,8 @@ class HomeFragment : Fragment(), OnItemInteractionListener {
                         is Resource.Success -> {
                             println("recyclerview data collection success ========= " + resource.data)
                             binding.progressBar.visibility = View.GONE
-                            rvAdapter.updateItems(resource.data!!)
+                            items = resource.data!!
+                            rvAdapter.updateItems(items)
                             calculateSum(resource.data)
                         }
                     }

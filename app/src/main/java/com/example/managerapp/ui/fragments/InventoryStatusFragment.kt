@@ -5,11 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.managerapp.R
 import com.example.managerapp.adapters.ItemAdapter
 import com.example.managerapp.adapters.OnItemInteractionListener
 import com.example.managerapp.databinding.FragmentInventoryStatusBinding
@@ -26,6 +28,7 @@ class InventoryStatusFragment : Fragment(), OnItemInteractionListener {
     lateinit var viewModel: ManagerViewModel
     private lateinit var rvAdapter: ItemAdapter
     private lateinit var user: FirebaseUser
+    private lateinit var items:List<Item>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,11 +44,23 @@ class InventoryStatusFragment : Fragment(), OnItemInteractionListener {
 
         viewModel = (activity as ManagerActivity).viewModel
 
-        rvAdapter = ItemAdapter(emptyList(),this)
+        val btnDownload = requireActivity().findViewById<ImageButton>(R.id.customIcon)
+
+        items = emptyList()
+        rvAdapter = ItemAdapter(items,this)
         binding.rvInventory.layoutManager = LinearLayoutManager(context)
         binding.rvInventory.adapter = rvAdapter
 
         user = viewModel.getCurrentUser()!!
+
+        btnDownload.setOnClickListener {
+            if(items.isEmpty())
+                Toast.makeText(requireActivity(),"No items found",Toast.LENGTH_LONG).show()
+            else{
+                Toast.makeText(requireActivity(),"Downloading File",Toast.LENGTH_LONG).show()
+                viewModel.generateInventoryPdf("Low Inventory",items,"LowInventory")
+            }
+        }
 
         observeItemsResult()
     }
@@ -110,7 +125,8 @@ class InventoryStatusFragment : Fragment(), OnItemInteractionListener {
                             val filteredItems = resource.data!!.filter { item ->
                                 item.item_stock!!<item.min_quantity!!
                             }
-                            rvAdapter.updateItems(filteredItems)
+                            items = filteredItems
+                            rvAdapter.updateItems(items)
                         }
                     }
 

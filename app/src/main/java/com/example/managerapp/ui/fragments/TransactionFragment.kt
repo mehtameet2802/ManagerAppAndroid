@@ -70,15 +70,18 @@ class TransactionFragment : Fragment() {
         if (item.text.isEmpty() || item.text.toString()=="Choose Item")
             item.error = "Select an item"
         else if (transaction.text.isEmpty() || transaction.text.toString()=="Transaction"){
+            println("Here transaction error")
             item.error = null
             transaction.error = "Select transaction"
         }
         else if (quantity.text.isEmpty()){
+            println("here quantity error")
             item.error = null
             transaction.error = null
             quantity.error = "Enter quantity"
         }
         else {
+            println("Here entering transact btn")
             quantity.error = null
             item.error = null
             transaction.error = null
@@ -89,21 +92,21 @@ class TransactionFragment : Fragment() {
             } else if (transaction.text.toString() == "Sell") {
                 newStock -= quantity.text.toString().toInt()
             }
-            else{
-                viewModel.updateItemStock(user.uid, currentItem.item_id!!, newStock)
-                viewModel.addTransaction(
-                    user.uid,
-                    Transaction(
-                        "",
-                        currentItem.item_cost!!,
-                        currentItem.item_name!!,
-                        transaction.text.toString(),
-                        quantity.text.toString().toInt(),
-                        newStock,
-                        (System.currentTimeMillis() / 1000).toString()
-                    )
+            println("Calling viewmodels")
+            viewModel.updateItemStock(user.uid, currentItem.item_id!!, newStock)
+            viewModel.addTransaction(
+                user.uid,
+                Transaction(
+                    "",
+                    currentItem.item_cost!!,
+                    currentItem.item_name!!,
+                    transaction.text.toString(),
+                    quantity.text.toString().toInt(),
+                    newStock,
+                    (System.currentTimeMillis() / 1000).toString()
                 )
-            }
+            )
+
         }
     }
 
@@ -133,8 +136,8 @@ class TransactionFragment : Fragment() {
     }
 
     private fun clearFields() {
-        binding.tvItem.setText("Choose Item")
-        binding.tvTrans.setText("Transaction")
+        binding.tvItem.setText("Choose Item",false)
+        binding.tvTrans.setText("Transaction",false)
         binding.tvQuant.setText("")
     }
 

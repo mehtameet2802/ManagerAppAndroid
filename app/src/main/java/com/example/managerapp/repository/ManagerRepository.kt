@@ -79,7 +79,7 @@ class ManagerRepository {
          awaitClose{ listenerItems.remove() }
     }
 
-    fun getAllTransactions(userId:String,startDate:String,endDate:String):Task<QuerySnapshot>{
+    fun getTransactionHistory(userId:String,startDate:String,endDate:String):Task<QuerySnapshot>{
         return firebaseDb
             .collection("users")
             .document(userId)

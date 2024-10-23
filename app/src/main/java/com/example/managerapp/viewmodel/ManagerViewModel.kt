@@ -54,9 +54,9 @@ class ManagerViewModel(
         MutableStateFlow<Resource<DocumentReference>>(Resource.StandBy())
     val addTransactionResult = _addTransactionResult.asStateFlow()
 
-    private var _getTransactionResult =
+    private var _getTransactionHistoryResult =
         MutableStateFlow<Resource<QuerySnapshot>>(Resource.StandBy())
-    val getTransactionResult = _getTransactionResult.asStateFlow()
+    val getTransactionHistoryResult = _getTransactionHistoryResult.asStateFlow()
 
 
     fun logout() {
@@ -150,18 +150,18 @@ class ManagerViewModel(
         }
     }
 
-    fun getAllTransaction(userId: String, startDate: String, endDate: String) {
+    fun getTransactionHistory(userId: String, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getTransactionResult.value = Resource.Loading()
-            managerRepository.getAllTransactions(userId, startDate, endDate)
+            _getTransactionHistoryResult.value = Resource.Loading()
+            managerRepository.getTransactionHistory(userId, startDate, endDate)
                 .addOnSuccessListener { querySnapshot ->
-                    _getTransactionResult.value = Resource.Success(querySnapshot)
-                    _getTransactionResult.value = Resource.StandBy()
+                    _getTransactionHistoryResult.value = Resource.Success(querySnapshot)
+                    _getTransactionHistoryResult.value = Resource.StandBy()
                 }
                 .addOnFailureListener { e ->
-                    _getTransactionResult.value =
-                        Resource.Error(e.message ?: "Could not get the items")
-                    _getTransactionResult.value = Resource.StandBy()
+                    _getTransactionHistoryResult.value =
+                        Resource.Error(e.message ?: "Could not get the transactions")
+                    _getTransactionHistoryResult.value = Resource.StandBy()
                 }
         }
     }

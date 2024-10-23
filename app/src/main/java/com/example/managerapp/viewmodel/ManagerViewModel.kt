@@ -55,7 +55,7 @@ class ManagerViewModel(
     val addTransactionResult = _addTransactionResult.asStateFlow()
 
     private var _getTransactionHistoryResult =
-        MutableStateFlow<Resource<QuerySnapshot>>(Resource.StandBy())
+        MutableStateFlow<Resource<List<Transaction>>>(Resource.StandBy())
     val getTransactionHistoryResult = _getTransactionHistoryResult.asStateFlow()
 
 
@@ -119,7 +119,7 @@ class ManagerViewModel(
                     _getItemResult.value = Resource.StandBy()
                 } catch (e:Exception) {
                     Log.d("HomeFragment", "in error")
-                    _getItemResult.value = Resource.Error(e.message?:"Error occurrec when getting all items")
+                    _getItemResult.value = Resource.Error(e.message?:"Error occurred when getting all items")
                     delay(500)
                     _getItemResult.value = Resource.StandBy()
                 }
@@ -153,16 +153,18 @@ class ManagerViewModel(
     fun getTransactionHistory(userId: String, startDate: String, endDate: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _getTransactionHistoryResult.value = Resource.Loading()
-            managerRepository.getTransactionHistory(userId, startDate, endDate)
-                .addOnSuccessListener { querySnapshot ->
-                    _getTransactionHistoryResult.value = Resource.Success(querySnapshot)
+            managerRepository.getTransactionHistory(userId, startDate, endDate).collect{ transactions ->
+                try {
+                    _getTransactionHistoryResult.value = Resource.Success(transactions)
+                    delay(500)
                     _getTransactionHistoryResult.value = Resource.StandBy()
                 }
-                .addOnFailureListener { e ->
-                    _getTransactionHistoryResult.value =
-                        Resource.Error(e.message ?: "Could not get the transactions")
+                catch (e:Exception){
+                    _getTransactionHistoryResult.value = Resource.Error(e.message?:"Unable to get transactions")
+                    delay(500)
                     _getTransactionHistoryResult.value = Resource.StandBy()
                 }
+            }
         }
     }
 

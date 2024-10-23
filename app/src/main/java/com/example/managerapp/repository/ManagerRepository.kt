@@ -79,8 +79,8 @@ class ManagerRepository {
          awaitClose{ listenerItems.remove() }
     }
 
-    fun getTransactionHistory(userId:String,startDate:String,endDate:String):Task<QuerySnapshot>{
-        return firebaseDb
+    fun getTransactionHistory(userId:String,startDate:String,endDate:String): Flow<List<Transaction>> = callbackFlow{
+        val transactionItems = firebaseDb
             .collection("users")
             .document(userId)
             .collection("transactions")
@@ -88,6 +88,24 @@ class ManagerRepository {
             .whereLessThanOrEqualTo("transaction_date_time",endDate)
             .get()
 
+        val listener = transactionItems.addOnSuccessListener { querySnapshot ->
+                if(querySnapshot.isEmpty){
+                    trySend(emptyList())
+                }
+                else{
+                    querySnapshot?.let { data ->
+                        val transactions = data.toObjects(Transaction::class.java)
+                        Log.d("HistoryFragment",transactions.toString())
+                        trySend(transactions)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.d("HistoryFragement","Failed to get transactions")
+                close(e)
+            }
+
+        awaitClose { listener }
     }
 
 

@@ -77,4 +77,14 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
+    // Hilt dependency
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // For ViewModel injection
+    implementation(libs.androidx.hilt.lifecycle.viewmodel)
+
+    // For Kotlin annotation processing
+    kapt(libs.androidx.hilt.compiler)
+
 }

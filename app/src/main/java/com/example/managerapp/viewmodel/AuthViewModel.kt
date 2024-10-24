@@ -17,16 +17,20 @@ import com.example.managerapp.models.User
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.repository.AuthRepository
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel(
-    app: Application,
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    @ApplicationContext app: Context,
     private val authRepository: AuthRepository
-) : AndroidViewModel(app) {
+) : AndroidViewModel(app as Application) {
 
     private val _authResult = MutableStateFlow<Resource<FirebaseUser>>(Resource.StandBy())
     val authResult = _authResult.asStateFlow()
@@ -70,7 +74,7 @@ class AuthViewModel(
                 authRepository.logIn(email, password)
                     .addOnSuccessListener { result ->
                         _authResult.value = Resource.Success(result.user!!)
-                        storeUserLocally(User(result.user!!.email!!,result.user!!.uid))
+//                        storeUserLocally(User(result.user!!.email!!,result.user!!.uid))
                         resetAuthResult()
                     }
                     .addOnFailureListener { e ->
@@ -113,11 +117,11 @@ class AuthViewModel(
         return authRepository.getCurrentUser()
     }
 
-    private fun storeUserLocally(user: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            authRepository.storeUserLocally(user)
-        }
-    }
+//    private fun storeUserLocally(user: User) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            authRepository.storeUserLocally(user)
+//        }
+//    }
 
 //    fun getCurrentUser(): User? {
 //        if(hasInternetConnection()){

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -14,30 +15,29 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.managerapp.R
 import com.example.managerapp.databinding.ActivityManagerBinding
-import com.example.managerapp.db.UserDatabase
+//import com.example.managerapp.db.UserDatabase
 import com.example.managerapp.repository.AuthRepository
 import com.example.managerapp.repository.ManagerRepository
 import com.example.managerapp.viewmodel.AuthViewModelFactory
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.example.managerapp.viewmodel.ManagerViewModelFactory
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ManagerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityManagerBinding
     private lateinit var navController: NavController
-    lateinit var viewModel: ManagerViewModel
+
+    val viewModel: ManagerViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityManagerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val authRepository = AuthRepository(UserDatabase(this))
-        val managerRepository = ManagerRepository()
-        val viewModelFactory = ManagerViewModelFactory(application,authRepository,managerRepository)
-        viewModel = ViewModelProvider(this,viewModelFactory)[ManagerViewModel::class.java]
-
 
         navController = supportFragmentManager.findFragmentById(R.id.managerNavHostFragment)
             ?.findNavController()!!

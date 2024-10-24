@@ -30,6 +30,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.type.DateTime
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,12 +46,14 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import javax.inject.Inject
 
-class ManagerViewModel(
-    val app: Application,
+@HiltViewModel
+class ManagerViewModel @Inject constructor(
+    @ApplicationContext val app: Context,
     private val authRepository: AuthRepository,
     private val managerRepository: ManagerRepository
-) : AndroidViewModel(app) {
+) : AndroidViewModel(app as Application) {
 
     private var _addItemResult = MutableStateFlow<Resource<DocumentReference>>(Resource.StandBy())
     val addItemResult = _addItemResult.asStateFlow()

@@ -24,8 +24,10 @@ import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(), OnItemInteractionListener {
 
     lateinit var binding: FragmentHomeBinding

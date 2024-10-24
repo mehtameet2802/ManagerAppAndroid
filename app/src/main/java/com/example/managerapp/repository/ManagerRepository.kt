@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.managerapp.models.Item
 import com.example.managerapp.models.Transaction
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -11,14 +12,16 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 
-class ManagerRepository {
+class ManagerRepository @Inject constructor(
+    private val firestore: FirebaseFirestore,
+) {
 
-    private val firebaseDb = FirebaseFirestore.getInstance()
 
     fun addItem(userId: String,item: Item): Task<DocumentReference> {
-        return firebaseDb
+        return firestore
             .collection("users")
             .document(userId)
             .collection("items")
@@ -26,7 +29,7 @@ class ManagerRepository {
     }
 
     fun updateItem(userId: String, itemId: String): Task<Void> {
-        return firebaseDb
+        return firestore
             .collection("users")
             .document(userId)
             .collection("items")
@@ -35,7 +38,7 @@ class ManagerRepository {
     }
 
     fun updateItemStock(userId: String, itemId: String, stock: Int): Task<Void> {
-        return firebaseDb
+        return firestore
             .collection("users")
             .document(userId)
             .collection("items")
@@ -44,7 +47,7 @@ class ManagerRepository {
     }
 
     fun addTransaction(userId:String,transaction: Transaction):Task<DocumentReference>{
-        return firebaseDb
+        return firestore
             .collection("users")
             .document(userId)
             .collection("transactions")
@@ -52,7 +55,7 @@ class ManagerRepository {
     }
 
     fun updateTransaction(userId: String,transId:String):Task<Void>{
-        return firebaseDb
+        return firestore
             .collection("users")
             .document(userId)
             .collection("transactions")
@@ -61,7 +64,7 @@ class ManagerRepository {
     }
 
     fun getAllItems(userId:String): Flow<List<Item>> = callbackFlow {
-         val listenerItems = firebaseDb
+         val listenerItems = firestore
             .collection("users")
             .document(userId)
             .collection("items")
@@ -80,7 +83,7 @@ class ManagerRepository {
     }
 
     fun getTransactionHistory(userId:String,startDate:String,endDate:String): Flow<List<Transaction>> = callbackFlow{
-        val transactionItems = firebaseDb
+        val transactionItems = firestore
             .collection("users")
             .document(userId)
             .collection("transactions")

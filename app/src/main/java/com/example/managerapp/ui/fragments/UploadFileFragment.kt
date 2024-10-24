@@ -27,9 +27,11 @@ import com.example.managerapp.databinding.FragmentUploadFileBinding
 import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.common.base.Objects
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+@AndroidEntryPoint
 class UploadFileFragment : Fragment() {
 
     lateinit var binding: FragmentUploadFileBinding

@@ -20,8 +20,10 @@ import com.example.managerapp.ui.LoginActivity
 import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
     lateinit var binding: FragmentLoginBinding

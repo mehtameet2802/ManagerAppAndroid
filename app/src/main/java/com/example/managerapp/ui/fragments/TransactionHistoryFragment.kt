@@ -18,12 +18,14 @@ import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
+@AndroidEntryPoint
 class TransactionHistoryFragment : Fragment() {
 
     lateinit var binding: FragmentTransactionHistoryBinding

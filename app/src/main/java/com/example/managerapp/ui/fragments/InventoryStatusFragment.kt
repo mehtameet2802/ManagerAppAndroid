@@ -20,8 +20,10 @@ import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class InventoryStatusFragment : Fragment(), OnItemInteractionListener {
 
     lateinit var binding: FragmentInventoryStatusBinding

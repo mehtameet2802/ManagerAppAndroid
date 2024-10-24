@@ -18,9 +18,11 @@ import com.example.managerapp.databinding.FragmentForgotPasswordBinding
 import com.example.managerapp.ui.LoginActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ForgotPasswordFragment : Fragment() {
 
     lateinit var binding: FragmentForgotPasswordBinding

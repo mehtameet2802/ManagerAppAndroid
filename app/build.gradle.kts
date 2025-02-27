@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.managerapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.managerapp"
@@ -36,7 +36,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
     buildFeatures {
+        compose = true
         viewBinding = true
     }
 }
@@ -81,8 +85,18 @@ dependencies {
     // Hilt dependency
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+//    kapt(libs.hilt.android.compiler)
 
     // For Kotlin annotation processing
     kapt(libs.androidx.hilt.compiler)
+
+    // jetpack compose
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
+
 
 }

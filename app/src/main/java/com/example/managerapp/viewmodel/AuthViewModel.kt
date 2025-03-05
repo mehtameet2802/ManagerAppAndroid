@@ -107,7 +107,7 @@ class AuthViewModel @Inject constructor(
             }
         } else{
             _authResult.value = Resource.Error("No Internet Connection")
-            resetAuthResult()
+            resetForgetPasswordResult()
         }
 
     }

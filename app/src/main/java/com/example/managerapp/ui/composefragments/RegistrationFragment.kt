@@ -1,6 +1,6 @@
 package com.example.managerapp.ui.composefragments
 
-import android.widget.Toast
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,14 +19,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,73 +32,49 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.managerapp.R
-import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.AuthViewModel
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ForgotPasswordFragment(viewModel: AuthViewModel, navController: NavController) {
+fun RegistrationFragment(viewModel:AuthViewModel, navController: NavController) {
+
     var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    LaunchedEffect(viewModel.forgotPasswordResult) {
-
-        viewModel.forgotPasswordResult.collect { resource ->
-
-            when (resource) {
-                is Resource.Loading -> isLoading = true
-                is Resource.Success -> {
-                    isLoading = false
-                    Toast.makeText(context, "Reset Password Mail Sent", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.loginFragment)
-                }
-
-                is Resource.Error -> {
-                    isLoading = false
-                    Toast.makeText(
-                        context,
-                        resource.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                is Resource.StandBy -> isLoading = false
-            }
-        }
-    }
-
-
-    // Use the extracted UI
-    ForgotPasswordDesign(
+    RegistrationFragmentDesign(
         email = email,
         onEmailChange = { email = it },
+        password = password,
+        onPasswordChange = { password = it },
+        confirmPassword = confirmPassword,
+        onConfirmPasswordChange = { confirmPassword = it },
         isLoading = isLoading,
-        onForgotPassword = {
-            isLoading = true
-            viewModel.forgotPassword(email)
-        },
+        onRegister = {},
         onLogin = {
             navController.navigate(R.id.loginFragment)
         }
     )
-
 }
 
 @Composable
-fun ForgotPasswordDesign(
+fun RegistrationFragmentDesign(
     email: String,
     onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    confirmPassword: String,
+    onConfirmPasswordChange: (String) -> Unit,
     isLoading: Boolean,
-    onForgotPassword: () -> Unit,
+    onRegister: () -> Unit,
     onLogin: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 50.dp),
-        contentAlignment = Alignment.Center
+            .padding(vertical = 50.dp)
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -111,20 +85,23 @@ fun ForgotPasswordDesign(
             Spacer(modifier = Modifier.height(25.dp))
 
             Text(
-                text = "Reset Password",
+                text = "Register",
+                textAlign = TextAlign.Center,
                 fontSize = 30.sp,
-                textAlign = TextAlign.Center
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Image(
                 painter = painterResource(R.drawable.ic_manager),
-                contentDescription = "Forgot Password Image",
+                contentDescription = "Register Image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
             )
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             OutlinedTextField(
                 value = email,
@@ -136,21 +113,45 @@ fun ForgotPasswordDesign(
                     .padding(horizontal = 16.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text("Password") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = onConfirmPasswordChange,
+                label = { Text("Confirm Password") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             Button(
-                onClick = onForgotPassword,
+                onClick = onRegister,
                 modifier = Modifier
                     .width(150.dp)
                     .align(Alignment.CenterHorizontally)
             ) {
-                Text("Send Link", fontSize = 18.sp)
+                Text("Register")
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Login",
+                text = "Already Registered? Login",
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -167,15 +168,18 @@ fun ForgotPasswordDesign(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun ForgotPasswordPreview() {
-    ForgotPasswordDesign(
+fun RegistrationPreview() {
+    RegistrationFragmentDesign(
         email = "",
         onEmailChange = {},
+        password = "",
+        onPasswordChange = {},
+        confirmPassword = "",
+        onConfirmPasswordChange = {},
         isLoading = false,
-        onForgotPassword = {},
+        onRegister = {},
         onLogin = {}
     )
 }

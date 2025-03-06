@@ -1,5 +1,6 @@
-package com.example.managerapp.ui.composefragments
+package com.example.managerapp.ui.composescreens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +37,12 @@ import androidx.navigation.NavController
 import com.example.managerapp.R
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.AuthViewModel
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ForgotPasswordFragment(viewModel: AuthViewModel, navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+fun ForgotPasswordScreen(viewModel: AuthViewModel, navController: NavController) {
+    var email by rememberSaveable { mutableStateOf("") }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var emailError by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
     LaunchedEffect(viewModel.forgotPasswordResult) {
@@ -51,6 +52,7 @@ fun ForgotPasswordFragment(viewModel: AuthViewModel, navController: NavControlle
             when (resource) {
                 is Resource.Loading -> isLoading = true
                 is Resource.Success -> {
+                    Log.d("Login", resource.data.toString())
                     isLoading = false
                     Toast.makeText(context, "Reset Password Mail Sent", Toast.LENGTH_SHORT).show()
                     navController.navigate(R.id.loginFragment)
@@ -74,11 +76,20 @@ fun ForgotPasswordFragment(viewModel: AuthViewModel, navController: NavControlle
     // Use the extracted UI
     ForgotPasswordDesign(
         email = email,
-        onEmailChange = { email = it },
+        onEmailChange = {
+            email = it
+            emailError = if (emailValidation(it)) null else "Invalid email address"
+        },
+        emailError = emailError,
         isLoading = isLoading,
         onForgotPassword = {
             isLoading = true
-            viewModel.forgotPassword(email)
+            if (!emailValidation(email)) {
+                emailError = "Invalid email address"
+            } else {
+                emailError = null
+                viewModel.forgotPassword(email)
+            }
         },
         onLogin = {
             navController.navigate(R.id.loginFragment)
@@ -87,10 +98,15 @@ fun ForgotPasswordFragment(viewModel: AuthViewModel, navController: NavControlle
 
 }
 
+private fun emailValidation(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+}
+
 @Composable
 fun ForgotPasswordDesign(
     email: String,
     onEmailChange: (String) -> Unit,
+    emailError: String?,
     isLoading: Boolean,
     onForgotPassword: () -> Unit,
     onLogin: () -> Unit
@@ -104,11 +120,11 @@ fun ForgotPasswordDesign(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(vertical = 20.dp)
                 .verticalScroll(rememberScrollState())
                 .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(25.dp))
 
             Text(
                 text = "Reset Password",
@@ -129,7 +145,16 @@ fun ForgotPasswordDesign(
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
+                isError = emailError != null,
                 label = { Text("Email") },
+                placeholder = {
+                    Text("Please enter Email Address")
+                },
+                supportingText = {
+                    if (emailError != null) {
+                        Text(emailError)
+                    }
+                },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,9 +185,10 @@ fun ForgotPasswordDesign(
                     }
             )
 
-            if (isLoading) {
-                CircularProgressIndicator()
-            }
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
@@ -174,6 +200,7 @@ fun ForgotPasswordPreview() {
     ForgotPasswordDesign(
         email = "",
         onEmailChange = {},
+        emailError = null,
         isLoading = false,
         onForgotPassword = {},
         onLogin = {}

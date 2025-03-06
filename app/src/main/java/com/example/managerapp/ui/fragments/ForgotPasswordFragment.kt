@@ -1,28 +1,16 @@
 package com.example.managerapp.ui.fragments
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.example.managerapp.R
-import com.example.managerapp.databinding.FragmentForgotPasswordBinding
-import com.example.managerapp.ui.LoginActivity
-import com.example.managerapp.ui.composefragments.ForgotPasswordFragment
-import com.example.managerapp.utils.Resource
+import com.example.managerapp.ui.composeactivities.LoginActivity
+import com.example.managerapp.ui.composescreens.ForgotPasswordScreen
 import com.example.managerapp.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 //@AndroidEntryPoint
 //class ForgotPasswordFragment : Fragment() {
@@ -125,7 +113,7 @@ class ForgotPasswordFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                ForgotPasswordFragment(viewModel, findNavController())
+                ForgotPasswordScreen(viewModel, findNavController())
             }
         }
 

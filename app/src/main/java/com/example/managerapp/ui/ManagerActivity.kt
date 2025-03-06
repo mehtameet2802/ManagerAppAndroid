@@ -9,21 +9,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.managerapp.R
 import com.example.managerapp.databinding.ActivityManagerBinding
 //import com.example.managerapp.db.UserDatabase
-import com.example.managerapp.repository.AuthRepository
-import com.example.managerapp.repository.ManagerRepository
-import com.example.managerapp.viewmodel.AuthViewModelFactory
+import com.example.managerapp.ui.composeactivities.LoginActivity
 import com.example.managerapp.viewmodel.ManagerViewModel
-import com.example.managerapp.viewmodel.ManagerViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManagerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -160,7 +155,7 @@ class ManagerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
 
     private fun logOut(){
         viewModel.logout()
-        startActivity(Intent(this@ManagerActivity,LoginActivity::class.java))
+        startActivity(Intent(this@ManagerActivity, LoginActivity::class.java))
         finish()
     }
 }

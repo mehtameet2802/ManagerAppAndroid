@@ -19,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,7 +88,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
         }
     }
 
-    LoginFragmentDesign(
+    LoginScreenDesign(
         email = email,
         onEmailChange = {
             email = it
@@ -109,10 +113,10 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
 
         },
         onRegister = {
-            navController.navigate(R.id.registrationFragment)
+            navController.navigate("registration_screen")
         },
         onForgotPassword = {
-            navController.navigate(R.id.forgotPasswordFragment)
+            navController.navigate("forgot_password_screen")
         }
 
 
@@ -128,7 +132,7 @@ private fun passwordValidation(password: String): Boolean {
 }
 
 @Composable
-fun LoginFragmentDesign(
+fun LoginScreenDesign(
     email: String,
     onEmailChange: (String) -> Unit,
     emailError: String?,
@@ -141,6 +145,9 @@ fun LoginFragmentDesign(
     onForgotPassword: () -> Unit
 
 ) {
+    
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -210,6 +217,23 @@ fun LoginFragmentDesign(
                     }
                 },
                 singleLine = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }
+                    ) {
+                        Icon(
+                            painter = if (passwordVisibility) {
+                                painterResource(R.drawable.ic_visibility)
+                            } else {
+                                painterResource(R.drawable.ic_invisibility)
+                            },
+                            contentDescription = "visible_invisible_icon"
+                        )
+                    }
+                },
+                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -264,7 +288,7 @@ fun LoginFragmentDesign(
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    LoginFragmentDesign(
+    LoginScreenDesign(
         email = "",
         onEmailChange = {},
         emailError = null,

@@ -55,7 +55,7 @@ fun ForgotPasswordScreen(viewModel: AuthViewModel, navController: NavController)
                     Log.d("Login", resource.data.toString())
                     isLoading = false
                     Toast.makeText(context, "Reset Password Mail Sent", Toast.LENGTH_SHORT).show()
-                    navController.navigate(R.id.loginFragment)
+                    navController.navigate("login_screen")
                 }
 
                 is Resource.Error -> {
@@ -74,7 +74,7 @@ fun ForgotPasswordScreen(viewModel: AuthViewModel, navController: NavController)
 
 
     // Use the extracted UI
-    ForgotPasswordDesign(
+    ForgotPasswordScreenDesign(
         email = email,
         onEmailChange = {
             email = it
@@ -92,7 +92,9 @@ fun ForgotPasswordScreen(viewModel: AuthViewModel, navController: NavController)
             }
         },
         onLogin = {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate("login_screen") {
+                popUpTo("login_screen") { inclusive = true }
+            }
         }
     )
 
@@ -103,7 +105,7 @@ private fun emailValidation(email: String): Boolean {
 }
 
 @Composable
-fun ForgotPasswordDesign(
+fun ForgotPasswordScreenDesign(
     email: String,
     onEmailChange: (String) -> Unit,
     emailError: String?,
@@ -197,7 +199,7 @@ fun ForgotPasswordDesign(
 @Preview(showBackground = true)
 @Composable
 fun ForgotPasswordPreview() {
-    ForgotPasswordDesign(
+    ForgotPasswordScreenDesign(
         email = "",
         onEmailChange = {},
         emailError = null,

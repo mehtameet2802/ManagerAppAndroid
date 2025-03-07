@@ -16,20 +16,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +73,7 @@ fun RegistrationScreen(viewModel: AuthViewModel, navController: NavController) {
                     Log.d("Login", resource.data.toString())
                     isLoading = false
                     Toast.makeText(context, "Registered Successful", Toast.LENGTH_LONG).show()
-                    navController.navigate(R.id.loginFragment)
+                    navController.navigate("login_screen")
                 }
 
                 is Resource.StandBy -> isLoading = false
@@ -75,7 +81,7 @@ fun RegistrationScreen(viewModel: AuthViewModel, navController: NavController) {
         }
     }
 
-    RegistrationFragmentDesign(
+    RegistrationScreenDesign(
         email = email,
         onEmailChange = {
             email = it
@@ -112,7 +118,9 @@ fun RegistrationScreen(viewModel: AuthViewModel, navController: NavController) {
             }
         },
         onLogin = {
-            navController.navigate(R.id.loginFragment)
+            navController.navigate("login_screen") {
+                popUpTo("login_screen") { inclusive = true }
+            }
         }
     )
 }
@@ -122,7 +130,7 @@ private fun emailValidation(email: String): Boolean {
 }
 
 private fun passwordValidation(password: String, confirmPassword: String?): Boolean {
-    return if (confirmPassword != null) {
+    return if (confirmPassword != null && confirmPassword != "") {
         password == confirmPassword && password.length >= 8
     } else {
         password.length >= 8
@@ -130,7 +138,7 @@ private fun passwordValidation(password: String, confirmPassword: String?): Bool
 }
 
 @Composable
-fun RegistrationFragmentDesign(
+fun RegistrationScreenDesign(
     email: String,
     onEmailChange: (String) -> Unit,
     emailError: String?,
@@ -144,6 +152,10 @@ fun RegistrationFragmentDesign(
     onRegister: () -> Unit,
     onLogin: () -> Unit
 ) {
+
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    var confirmPasswordVisibility by rememberSaveable { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -213,6 +225,23 @@ fun RegistrationFragmentDesign(
                     }
                 },
                 singleLine = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }
+                    ) {
+                        Icon(
+                            painter = if (passwordVisibility) {
+                                painterResource(R.drawable.ic_visibility)
+                            } else {
+                                painterResource(R.drawable.ic_invisibility)
+                            },
+                            contentDescription = "visible_invisible_icon"
+                        )
+                    }
+                },
+                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -234,6 +263,23 @@ fun RegistrationFragmentDesign(
                     }
                 },
                 singleLine = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            confirmPasswordVisibility = !confirmPasswordVisibility
+                        }
+                    ) {
+                        Icon(
+                            painter = if (confirmPasswordVisibility) {
+                                painterResource(R.drawable.ic_visibility)
+                            } else {
+                                painterResource(R.drawable.ic_invisibility)
+                            },
+                            contentDescription = "visible_invisible_icon"
+                        )
+                    }
+                },
+                visualTransformation = if (confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -275,7 +321,7 @@ fun RegistrationFragmentDesign(
 @Preview(showBackground = true)
 @Composable
 fun RegistrationPreview() {
-    RegistrationFragmentDesign(
+    RegistrationScreenDesign(
         email = "",
         onEmailChange = {},
         emailError = null,

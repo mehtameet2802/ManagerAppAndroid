@@ -35,6 +35,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -78,9 +79,18 @@ class ManagerViewModel @Inject constructor(
         MutableStateFlow<Resource<List<Transaction>>>(Resource.StandBy())
     val getTransactionHistoryResult = _getTransactionHistoryResult.asStateFlow()
 
+    private val _currentUser = MutableStateFlow<FirebaseUser?>(null)
+    val currentUser: StateFlow<FirebaseUser?> get() = _currentUser
+
+    init {
+        // Initialize the current user (this could be checked from Firebase)
+        _currentUser.value = getCurrentUser()
+    }
+
 
     fun logout() {
         authRepository.logout()
+        _currentUser.value = null
     }
 
     fun getCurrentUser(): FirebaseUser? {
@@ -94,22 +104,21 @@ class ManagerViewModel @Inject constructor(
                 .addOnSuccessListener { documentReference ->
                     managerRepository.updateItem(userId, documentReference.id)
                         .addOnSuccessListener {
-                            Log.d("TransactionFragment","Data updated successfully")
+                            Log.d("TransactionFragment", "Data updated successfully")
                             _addItemResult.value = Resource.Success(documentReference)
-                            _addItemResult.value = Resource.StandBy()
                         }
                         .addOnFailureListener { e ->
-                            Log.d("TransactionFragment","Unable to update data")
+                            Log.d("TransactionFragment", "Unable to update data")
                             _addItemResult.value =
                                 Resource.Error(e.message ?: "Unable to update item")
-                            _addItemResult.value = Resource.StandBy()
                         }
                 }
                 .addOnFailureListener { e ->
-                    Log.d("TransactionFragment","Unable to add DataTr")
+                    Log.d("TransactionFragment", "Unable to add DataTr")
                     _addItemResult.value = Resource.Error(e.message ?: "Unable to add Item")
-                    _addItemResult.value = Resource.StandBy()
                 }
+            delay(500)
+            _addItemResult.value = Resource.StandBy()
         }
     }
 
@@ -182,7 +191,8 @@ class ManagerViewModel @Inject constructor(
             managerRepository.getTransactionHistory(userId, startDate, endDate)
                 .collect { transactions ->
                     try {
-                        val modifiedTransactions = transactions.sortedBy { it.transaction_date_time }
+                        val modifiedTransactions =
+                            transactions.sortedBy { it.transaction_date_time }
                         _getTransactionHistoryResult.value = Resource.Success(modifiedTransactions)
                         delay(500)
                         _getTransactionHistoryResult.value = Resource.StandBy()
@@ -217,7 +227,7 @@ class ManagerViewModel @Inject constructor(
         // Draw table header
         paint.textSize = 18f
         paint.color = Color.DKGRAY
-        val headers = listOf("Item", "Type","Quantity","Date")
+        val headers = listOf("Item", "Type", "Quantity", "Date")
         var startX = 50f
         val startY = 100f
         val rowHeight = 40f
@@ -240,7 +250,11 @@ class ManagerViewModel @Inject constructor(
             startX += columnWidths[1]
             canvas.drawText(transaction.transaction_units.toString(), startX, currentY, paint)
             startX += columnWidths[2]
-            canvas.drawText(epochToDateString(transaction.transaction_date_time.toString().toLong()), startX, currentY, paint)
+            canvas.drawText(
+                epochToDateString(
+                    transaction.transaction_date_time.toString().toLong()
+                ), startX, currentY, paint
+            )
             currentY += rowHeight
         }
 
@@ -249,7 +263,9 @@ class ManagerViewModel @Inject constructor(
 
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val formattedDate = dateFormat.format(Calendar.getInstance().time)
-        val directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
+        val directoryPath =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .toString()
 
         val file = File(directoryPath, "TransactionHistory_$formattedDate.pdf")
 
@@ -258,20 +274,25 @@ class ManagerViewModel @Inject constructor(
             val outputStream = FileOutputStream(file)
             pdfDocument.writeTo(outputStream)
             outputStream.close()
-            Log.d("HistoryFragment","Pdf downloaded, ${file.path}")
+            Log.d("HistoryFragment", "Pdf downloaded, ${file.path}")
 
-            val notificationHelper = NotificationHelper(app.applicationContext,"pdf_channel","Download PDF")
-            notificationHelper.showDownloadNotification(file.path,"PDF Downloaded","PDF has been downloaded to")
+            val notificationHelper =
+                NotificationHelper(app.applicationContext, "pdf_channel", "Download PDF")
+            notificationHelper.showDownloadNotification(
+                file.path,
+                "PDF Downloaded",
+                "PDF has been downloaded to"
+            )
         } catch (e: IOException) {
             e.printStackTrace()
-            Log.d("HistoryFragment","Pdf error $e")
+            Log.d("HistoryFragment", "Pdf error $e")
         } finally {
             pdfDocument.close()
-            Log.d("HistoryFragment","Pdf close")
+            Log.d("HistoryFragment", "Pdf close")
         }
     }
 
-    fun generateInventoryPdf(headerString:String,items: List<Item>,fileName:String) {
+    fun generateInventoryPdf(headerString: String, items: List<Item>, fileName: String) {
         // Create a new PDF document
         val pdfDocument = PdfDocument()
         val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 size
@@ -291,7 +312,7 @@ class ManagerViewModel @Inject constructor(
         // Draw table header
         paint.textSize = 18f
         paint.color = Color.DKGRAY
-        val headers = listOf("Item","Stock","Price","Quantity")
+        val headers = listOf("Item", "Stock", "Price", "Quantity")
         var startX = 50f
         val startY = 100f
         val rowHeight = 40f
@@ -323,7 +344,9 @@ class ManagerViewModel @Inject constructor(
 
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val formattedDate = dateFormat.format(Calendar.getInstance().time)
-        val directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
+        val directoryPath =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .toString()
 
         val file = File(directoryPath, "${fileName}_$formattedDate.pdf")
 
@@ -332,16 +355,21 @@ class ManagerViewModel @Inject constructor(
             val outputStream = FileOutputStream(file)
             pdfDocument.writeTo(outputStream)
             outputStream.close()
-            Log.d("Downloading File","Pdf downloaded, ${file.path}")
+            Log.d("Downloading File", "Pdf downloaded, ${file.path}")
 
-            val notificationHelper = NotificationHelper(app.applicationContext,"pdf_channel","Download PDF")
-            notificationHelper.showDownloadNotification(file.path,"PDF Downloaded","PDF has been downloaded to")
+            val notificationHelper =
+                NotificationHelper(app.applicationContext, "pdf_channel", "Download PDF")
+            notificationHelper.showDownloadNotification(
+                file.path,
+                "PDF Downloaded",
+                "PDF has been downloaded to"
+            )
         } catch (e: IOException) {
             e.printStackTrace()
-            Log.d("Downloading File","Pdf error $e")
+            Log.d("Downloading File", "Pdf error $e")
         } finally {
             pdfDocument.close()
-            Log.d("Downloading File","Pdf close")
+            Log.d("Downloading File", "Pdf close")
         }
     }
 
@@ -382,8 +410,9 @@ class ManagerViewModel @Inject constructor(
     }
 
     fun epochToDateString(epochSec: Long): String {
-        val date = Date(epochSec*1000)
-        val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Customize the format as needed
+        val date = Date(epochSec * 1000)
+        val format =
+            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Customize the format as needed
         return format.format(date)
     }
 

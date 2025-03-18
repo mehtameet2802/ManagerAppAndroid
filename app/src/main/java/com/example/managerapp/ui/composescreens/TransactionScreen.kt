@@ -21,7 +21,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -106,7 +105,7 @@ fun TransactionScreen(viewModel: ManagerViewModel) {
             } else if (transaction == "Sell") {
                 newStock -= quantity.toInt()
             }
-            println("Calling viewmodels")
+            println("Calling all the Viewmodel")
             user?.let { viewModel.updateItemStock(it.uid, currentItem.item_id!!, newStock) }
             user?.let {
                 viewModel.addTransaction(
@@ -127,7 +126,7 @@ fun TransactionScreen(viewModel: ManagerViewModel) {
     }
 
     // Load items when screen is created
-    LaunchedEffect(user) {
+    LaunchedEffect(Unit) {
         user?.let {
             viewModel.getAllItems(it.uid)
         }
@@ -274,9 +273,12 @@ fun TransactionScreenDesign(
 
             ExposedDropdownMenuBox(
                 expanded = itemDropdownExpanded,
-                onExpandedChange = { onItemDropdownExpandedChange(it) }
+                onExpandedChange = { onItemDropdownExpandedChange(it) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
-                TextField(
+                OutlinedTextField(
                     value = itemSelected,
                     onValueChange = { onItemSelected(it) },
                     readOnly = true,
@@ -290,7 +292,10 @@ fun TransactionScreenDesign(
                             Text(itemError)
                         }
                     },
-                    modifier = Modifier.exposedDropdownSize()
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
                 )
                 ExposedDropdownMenu(
                     expanded = itemDropdownExpanded,
@@ -313,9 +318,12 @@ fun TransactionScreenDesign(
 
             ExposedDropdownMenuBox(
                 expanded = transactionDropdownExpanded,
-                onExpandedChange = { onTransactionDropdownExpandedChange(it) }
+                onExpandedChange = { onTransactionDropdownExpandedChange(it) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
-                TextField(
+                OutlinedTextField(
                     value = transactionSelected,
                     onValueChange = { onTransactionSelected(it) },
                     readOnly = true,
@@ -329,7 +337,9 @@ fun TransactionScreenDesign(
                             Text(transactionError)
                         }
                     },
-                    modifier = Modifier.exposedDropdownSize()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
                 )
                 ExposedDropdownMenu(
                     expanded = transactionDropdownExpanded,
@@ -393,9 +403,27 @@ fun TransactionScreenDesign(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun TransactionScreenPreview() {
-
+    TransactionScreenDesign(
+        quantity = "10",
+        onQuantityChange = {},
+        quantityError = null,
+        itemOptions = listOf("Choose Item", "Item 1", "Item 2", "Item 3"),
+        itemSelected = "Item 1",
+        itemError = null,
+        onItemSelected = {},
+        onItemDropdownExpandedChange = {},
+        itemDropdownExpanded = false,
+        transactionOptions = listOf("Choose Transaction", "Buy", "Sell"),
+        transactionSelected = "Buy",
+        transactionError = null,
+        onTransactionSelected = {},
+        transactionDropdownExpanded = false,
+        onTransactionDropdownExpandedChange = {},
+        onTransact = {},
+        isLoading = false
+    )
 }
 

@@ -169,18 +169,27 @@ class ManagerViewModel @Inject constructor(
                     managerRepository.updateTransaction(userId, documentReference.id)
                         .addOnSuccessListener {
                             _addTransactionResult.value = Resource.Success(documentReference)
-                            _addTransactionResult.value = Resource.StandBy()
+                            viewModelScope.launch {
+                                delay(500)  // Allow UI to observe success before resetting
+                                _addTransactionResult.value = Resource.StandBy()
+                            }
                         }
                         .addOnFailureListener { e ->
                             _addTransactionResult.value =
                                 Resource.Error(e.message ?: "Unable to update transaction")
-                            _addTransactionResult.value = Resource.StandBy()
+                            viewModelScope.launch {
+                                delay(500)  // Allow UI to observe success before resetting
+                                _addTransactionResult.value = Resource.StandBy()
+                            }
                         }
                 }
                 .addOnFailureListener { e ->
                     _addTransactionResult.value =
                         Resource.Error(e.message ?: "Unable to add transaction")
-                    _addTransactionResult.value = Resource.StandBy()
+                    viewModelScope.launch {
+                        delay(500)  // Allow UI to observe success before resetting
+                        _addTransactionResult.value = Resource.StandBy()
+                    }
                 }
         }
     }

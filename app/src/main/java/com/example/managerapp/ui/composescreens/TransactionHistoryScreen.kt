@@ -2,7 +2,6 @@ package com.example.managerapp.ui.composescreens
 
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,14 +15,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,19 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentManager
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
-import com.google.android.material.datepicker.MaterialDatePicker
 
-// Helper function to get FragmentManager in Compose
-@Composable
-fun rememberFragmentManager(): FragmentManager {
-    val context = LocalContext.current
-    return remember {
-        (context as AppCompatActivity).supportFragmentManager
-    }
-}
 
 @Composable
 fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
@@ -54,6 +47,7 @@ fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
     var endDateError by rememberSaveable { mutableStateOf<String?>(null) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
 
+    var isDatePickerVisible by rememberSaveable { mutableStateOf(false) }
     var calenderStartDate by rememberSaveable { mutableStateOf("") }
     var calenderEndDate by rememberSaveable { mutableStateOf("") }
 
@@ -112,25 +106,8 @@ fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
             endDate = it
         },
         endDateError = endDateError,
-        onSelectDates = {
-            val picker = MaterialDatePicker.Builder.dateRangePicker()
-                .setTitleText("Select Date Range")
-                .build()
-
-            picker.show(rememberFragmentManager(), "TransactionFragment")
-
-            picker.addOnPositiveButtonClickListener {
-                calenderStartDate = (it.first / 1000).toString()
-                calenderEndDate = (it.second / 1000).toString()
-
-                startDate = viewModel.convertTimeToDate(it.first)
-                endDate = viewModel.convertTimeToDate(it.second)
-                Log.d("HistoryFragment", it.toString())
-            }
-
-            picker.addOnNegativeButtonClickListener {
-                picker.dismiss()
-            }
+        onShowDatePicker = {
+            isDatePickerVisible = true
         },
         onDownload = {
             if (startDate.isEmpty() && endDate.isEmpty()) {
@@ -150,10 +127,80 @@ fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
                 }
             }
         },
+        selectDateRange = {
+
+            calenderStartDate = (it.first?.div(1000)).toString()
+            calenderEndDate = (it.second?.div(1000)).toString()
+
+            startDate = it.first?.let { it1 -> viewModel.convertTimeToDate(it1) }.toString()
+            endDate = it.second?.let { it1 -> viewModel.convertTimeToDate(it1) }.toString()
+            Log.d("HistoryFragment", it.toString())
+
+        },
+        onDismissDatePicker = {
+            isDatePickerVisible = false
+        },
+        isDatePickerVisible = isDatePickerVisible,
         isLoading = isLoading,
     )
 
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateRangePickerModal(
+    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val dateRangePickerState = rememberDateRangePickerState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+    ) {
+
+        DatePickerDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDateRangeSelected(
+                            Pair(
+                                dateRangePickerState.selectedStartDateMillis,
+                                dateRangePickerState.selectedEndDateMillis
+                            )
+                        )
+                        onDismiss()
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DateRangePicker(
+                state = dateRangePickerState,
+                title = {
+                    Text(
+                        text = "Select Dates"
+                    )
+                },
+                showModeToggle = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .padding(16.dp)
+            )
+        }
+    }
+}
+
 
 @Composable
 fun TransactionHistoryDesign(
@@ -163,8 +210,11 @@ fun TransactionHistoryDesign(
     endDate: String,
     onEndDateChange: (String) -> Unit,
     endDateError: String?,
-    onSelectDates: @Composable () -> Unit,
+    onShowDatePicker: () -> Unit,
     onDownload: () -> Unit,
+    selectDateRange: (Pair<Long?, Long?>) -> Unit,
+    onDismissDatePicker: () -> Unit,
+    isDatePickerVisible: Boolean,
     isLoading: Boolean
 ) {
     Box(
@@ -221,7 +271,7 @@ fun TransactionHistoryDesign(
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
-                onClick = { onSelectDates },
+                onClick = onShowDatePicker,
                 modifier = Modifier
                     .width(150.dp)
                     .align(Alignment.CenterHorizontally)
@@ -239,8 +289,15 @@ fun TransactionHistoryDesign(
             ) {
                 Text("Download")
             }
-
         }
+
+        if (isDatePickerVisible) {
+            DateRangePickerModal(
+                onDateRangeSelected = selectDateRange,
+                onDismiss = onDismissDatePicker
+            )
+        }
+
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
@@ -259,8 +316,11 @@ fun TransactionHistoryPreview() {
         endDate = "",
         onEndDateChange = {},
         endDateError = "",
-        onSelectDates = {},
+        onShowDatePicker = {},
         onDownload = {},
+        selectDateRange = {},
+        onDismissDatePicker = {},
+        isDatePickerVisible = true,
         isLoading = false
     )
 }

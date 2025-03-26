@@ -26,9 +26,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,8 +38,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.managerapp.models.Item
+import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
-import dagger.hilt.android.internal.Contexts
 
 
 @Composable
@@ -50,6 +51,7 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
     var fileTypeError by rememberSaveable { mutableStateOf<String?>(null) }
     var fileTypeDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     var csvUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val user by viewModel.currentUser.collectAsState()
     var isLoading by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -61,24 +63,29 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
         try {
             val inputStream = contentResolver.openInputStream(uri)
             inputStream?.bufferedReader()?.use { reader ->
-                val csvData = mutableListOf<Item>()
-
                 reader.readLine()
                 reader.forEachLine { line ->
                     val tokens = line.split(",")
-                    if (tokens.size >= 3) {
+                    if (tokens.size >= 4) {
                         val item = Item(
-                            item_id = tokens[0],
-                            item_name = tokens[1],
-                            item_stock = tokens[2].toIntOrNull() ?: 0
+                            null,
+                            item_name = tokens[0],
+                            item_stock = tokens[1].toIntOrNull() ?: 0,
+                            item_cost = tokens[2].toIntOrNull() ?: 0,
+                            min_quantity = tokens[3].toIntOrNull() ?: 0
                         )
-                        csvData.add(item)
+                        user?.let {
+                            viewModel.addItem(
+                                it.uid,
+                                item
+                            )
+                        }
                     }
                 }
-
             }
-
+            Toast.makeText(context, "CSV Processed Successfully", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
+            println("error reading csv $e")
             Toast.makeText(context, "Error reading CSV", Toast.LENGTH_SHORT).show()
         }
     }
@@ -94,10 +101,7 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
             }
         }
 
-        return if (uri.lastPathSegment == null)
-            ""
-        else
-            uri.lastPathSegment.toString() // Fallback
+        return uri.lastPathSegment ?: ""
     }
 
 
@@ -105,11 +109,50 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
-                csvUri = uri
-                fileName = getFileNameFromUri(uri)
+                // Validate file extension
+                val fileExtension = uri.toString().substringAfterLast(".")
+
+                // Method 2: Get MIME type from content resolver
+                val contentResolver = context.contentResolver
+                val mimeType = contentResolver.getType(uri)
+
+                // Method 3: Check file name
+                val uploadedFileName = getFileNameFromUri(uri)
+                val fileNameExtension = uploadedFileName.substringAfterLast(".").lowercase()
+
+                // Comprehensive CSV validation
+                val isCsvFile =
+                    (fileExtension == "csv" || fileNameExtension == "csv" || mimeType == "text/csv" || mimeType == "application/csv")
+
+
+                if (isCsvFile) {
+                    csvUri = uri
+                    fileName = getFileNameFromUri(uri)
+                    fileNameError = null
+                    fileTypeError = null
+                } else {
+                    println("file extension = $uri")
+                    Toast.makeText(
+                        context,
+                        "Please select a CSV file $fileExtension",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    fileNameError = "Invalid file type"
+                }
             }
         }
     )
+
+    fun onSelectFile() {
+        fileTypeError = if (fileType != "csv")
+            "Please select file format"
+        else
+            null
+
+        if (fileTypeError == null) {
+            filePickerLauncher.launch("*/*")
+        }
+    }
 
     fun clearFields() {
         fileType = "File Format"
@@ -117,10 +160,9 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
         fileNameError = null
         fileTypeError = null
         csvUri = null
-//        csvData = mutableListOf()
     }
 
-    fun onUpload() {
+    fun onUploadFile() {
         fileTypeError = if (fileType != "csv")
             "Please select file format"
         else
@@ -137,19 +179,44 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
 
     }
 
+    LaunchedEffect(viewModel.addItemResult) {
+        viewModel.addItemResult.collect { resource ->
+            when (resource) {
+                is Resource.Error -> {
+                    isLoading = false
+                    println("unable to add new item ========= ")
+                    Toast.makeText(context, resource.message, Toast.LENGTH_LONG).show()
+                }
+
+                is Resource.Loading -> isLoading = true
+
+                is Resource.StandBy -> isLoading = false
+
+                is Resource.Success -> {
+                    println("new item added successfully ========= " + resource.data)
+                    isLoading = false
+                    clearFields()
+                }
+            }
+
+        }
+    }
+
     UploadFileDesign(
         fileName = fileName,
         fileNameError = fileNameError,
-        onSelectFile = {},
+        onSelectFile = { onSelectFile() },
         fileType = fileType,
         fileTypeOptions = listOf("File Format", "csv"),
         fileTypeError = fileTypeError,
-        onFileTypeSelected = {},
+        onFileTypeSelected = {
+            fileType = it
+        },
         fileTypeDropdownExpanded = fileTypeDropdownExpanded,
         onFileTypeDropdownExpandedChange = {
             fileTypeDropdownExpanded = it
         },
-        onUploadFile = {},
+        onUploadFile = { onUploadFile() },
         isLoading = isLoading
     )
 
@@ -228,10 +295,11 @@ fun UploadFileDesign(
             OutlinedTextField(
                 value = fileName,
                 onValueChange = {},
+                readOnly = true,
                 isError = fileNameError != null,
                 label = { Text("Start Date") },
                 placeholder = {
-                    Text("Please enter File Name")
+                    Text("Please select your file")
                 },
                 supportingText = {
                     if (fileNameError != null) {

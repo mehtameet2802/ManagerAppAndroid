@@ -1,32 +1,15 @@
 package com.example.managerapp.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.example.managerapp.R
-import com.example.managerapp.databinding.FragmentTransactionHistoryBinding
-import com.example.managerapp.ui.ManagerActivity
+import com.example.managerapp.ui.composeactivities.ManagerActivity
 import com.example.managerapp.ui.composescreens.TransactionHistoryScreen
-import com.example.managerapp.ui.composescreens.TransactionScreen
-import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
 
 //
 //@AndroidEntryPoint
@@ -141,20 +124,20 @@ import java.util.TimeZone
 //}
 
 
-@AndroidEntryPoint
-class TransactionHistoryFragment : Fragment() {
-
-    lateinit var viewModel: ManagerViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        viewModel = (activity as ManagerActivity).viewModel
-        return ComposeView(requireContext()).apply {
-            setContent {
-                TransactionHistoryScreen(viewModel)
-            }
-        }
-    }
-}
+//@AndroidEntryPoint
+//class TransactionHistoryFragment : Fragment() {
+//
+//    lateinit var viewModel: ManagerViewModel
+//
+//    override fun onCreateView(
+//        inflater: LayoutInflater, container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View {
+//        viewModel = (activity as ManagerActivity).viewModel
+//        return ComposeView(requireContext()).apply {
+//            setContent {
+//                TransactionHistoryScreen(viewModel)
+//            }
+//        }
+//    }
+//}

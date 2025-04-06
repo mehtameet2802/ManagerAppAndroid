@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.managerapp.R
-import com.example.managerapp.ui.ManagerActivity
+import com.example.managerapp.ui.composeactivities.ManagerActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.AuthViewModel
 

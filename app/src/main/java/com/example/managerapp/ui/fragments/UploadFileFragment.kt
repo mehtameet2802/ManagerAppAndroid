@@ -1,37 +1,15 @@
 package com.example.managerapp.ui.fragments
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.OpenableColumns
-import android.provider.Settings
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageButton
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.example.managerapp.R
-import com.example.managerapp.databinding.FragmentUploadFileBinding
-import com.example.managerapp.ui.ManagerActivity
+import com.example.managerapp.ui.composeactivities.ManagerActivity
 import com.example.managerapp.ui.composescreens.UploadFileScreen
 import com.example.managerapp.viewmodel.ManagerViewModel
-import com.google.common.base.Objects
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 //
 //@AndroidEntryPoint
@@ -236,21 +214,21 @@ import java.io.InputStreamReader
 //
 //}
 
-
-@AndroidEntryPoint
-class UploadFileFragment : Fragment() {
-
-    lateinit var viewModel: ManagerViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        viewModel = (activity as ManagerActivity).viewModel
-        return ComposeView(requireContext()).apply {
-            setContent {
-                UploadFileScreen(viewModel)
-            }
-        }
-    }
-}
+//
+//@AndroidEntryPoint
+//class UploadFileFragment : Fragment() {
+//
+//    lateinit var viewModel: ManagerViewModel
+//
+//    override fun onCreateView(
+//        inflater: LayoutInflater, container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View {
+//        viewModel = (activity as ManagerActivity).viewModel
+//        return ComposeView(requireContext()).apply {
+//            setContent {
+//                UploadFileScreen(viewModel)
+//            }
+//        }
+//    }
+//}

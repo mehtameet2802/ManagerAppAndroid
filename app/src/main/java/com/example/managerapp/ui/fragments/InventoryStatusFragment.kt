@@ -5,26 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.Toast
-import androidx.annotation.ContentView
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.managerapp.R
 import com.example.managerapp.adapters.ItemAdapter
-import com.example.managerapp.adapters.OnItemInteractionListener
 import com.example.managerapp.databinding.FragmentInventoryStatusBinding
 import com.example.managerapp.models.Item
-import com.example.managerapp.ui.ManagerActivity
+import com.example.managerapp.ui.composeactivities.ManagerActivity
 import com.example.managerapp.ui.composescreens.InventoryStatusScreen
-import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 //
 //@AndroidEntryPoint
@@ -144,24 +133,24 @@ import kotlinx.coroutines.launch
 //}
 
 
-@AndroidEntryPoint
-class InventoryStatusFragment : Fragment() {
-
-    lateinit var binding: FragmentInventoryStatusBinding
-    lateinit var viewModel: ManagerViewModel
-    private lateinit var rvAdapter: ItemAdapter
-    private lateinit var user: FirebaseUser
-    private lateinit var items: List<Item>
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        viewModel = (activity as ManagerActivity).viewModel
-        return ComposeView(requireContext()).apply {
-            setContent {
-                InventoryStatusScreen(viewModel)
-            }
-        }
-    }
-}
+//@AndroidEntryPoint
+//class InventoryStatusFragment : Fragment() {
+//
+//    lateinit var binding: FragmentInventoryStatusBinding
+//    lateinit var viewModel: ManagerViewModel
+//    private lateinit var rvAdapter: ItemAdapter
+//    private lateinit var user: FirebaseUser
+//    private lateinit var items: List<Item>
+//
+//    override fun onCreateView(
+//        inflater: LayoutInflater, container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View {
+//        viewModel = (activity as ManagerActivity).viewModel
+//        return ComposeView(requireContext()).apply {
+//            setContent {
+//                InventoryStatusScreen(viewModel)
+//            }
+//        }
+//    }
+//}

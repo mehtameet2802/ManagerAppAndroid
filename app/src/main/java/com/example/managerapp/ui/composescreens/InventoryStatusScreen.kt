@@ -1,10 +1,5 @@
 package com.example.managerapp.ui.composescreens
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,23 +9,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.util.fastCbrt
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.managerapp.R
-import com.example.managerapp.adapters.ItemAdapter
-import com.example.managerapp.adapters.OnItemInteractionListener
-import com.example.managerapp.databinding.FragmentInventoryStatusBinding
-import com.example.managerapp.models.Item
-import com.example.managerapp.ui.ManagerActivity
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
-import com.google.firebase.auth.FirebaseUser
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 //
 //@AndroidEntryPoint

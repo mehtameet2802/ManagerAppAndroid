@@ -38,12 +38,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.managerapp.models.Item
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
 
 @Composable
-fun UploadFileScreen(viewModel: ManagerViewModel) {
+fun UploadFileScreen(
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit,
+) {
 
     var fileName by rememberSaveable { mutableStateOf("") }
     var fileType by rememberSaveable { mutableStateOf("File Format") }
@@ -179,6 +183,14 @@ fun UploadFileScreen(viewModel: ManagerViewModel) {
 
     }
 
+    LaunchedEffect(Unit) {
+        setTopBarActions(
+            TopBarActions(
+                onClear = { clearFields() }
+            )
+        )
+    }
+
     LaunchedEffect(viewModel.addItemResult) {
         viewModel.addItemResult.collect { resource ->
             when (resource) {
@@ -297,7 +309,7 @@ fun UploadFileDesign(
                 onValueChange = {},
                 readOnly = true,
                 isError = fileNameError != null,
-                label = { Text("Start Date") },
+                label = { Text("File Name") },
                 placeholder = {
                     Text("Please select your file")
                 },

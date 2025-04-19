@@ -33,11 +33,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.managerapp.models.Item
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
 @Composable
-fun AddItemScreen(viewModel: ManagerViewModel) {
+fun AddItemScreen(
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit
+) {
+
     var itemName by rememberSaveable { mutableStateOf("") }
     var itemNameError by rememberSaveable { mutableStateOf<String?>(null) }
     var itemCost by rememberSaveable { mutableStateOf("") }
@@ -82,7 +87,7 @@ fun AddItemScreen(viewModel: ManagerViewModel) {
             "Enter Item Stock"
         else
             null
-        if(itemName.isNotEmpty() && itemCost.isNotEmpty() && minQuantity.isNotEmpty() && itemStock.isNotEmpty()){
+        if (itemName.isNotEmpty() && itemCost.isNotEmpty() && minQuantity.isNotEmpty() && itemStock.isNotEmpty()) {
             user?.let {
                 viewModel.addItem(
                     it.uid,
@@ -98,6 +103,13 @@ fun AddItemScreen(viewModel: ManagerViewModel) {
         }
     }
 
+    LaunchedEffect(Unit) {
+        setTopBarActions(
+            TopBarActions(
+                onClear = { clearFields() }
+            )
+        )
+    }
 
     LaunchedEffect(viewModel.addItemResult) {
         viewModel.addItemResult.collect { resource ->

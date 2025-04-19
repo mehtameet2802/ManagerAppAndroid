@@ -37,13 +37,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.managerapp.models.Item
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.models.Transaction
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
 
 @Composable
-fun TransactionScreen(viewModel: ManagerViewModel) {
+fun TransactionScreen(
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit
+) {
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var quantity by rememberSaveable { mutableStateOf("") }
@@ -130,6 +134,14 @@ fun TransactionScreen(viewModel: ManagerViewModel) {
         user?.let {
             viewModel.getAllItems(it.uid)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        setTopBarActions(
+            TopBarActions(
+                onClear = { clearFields() }
+            )
+        )
     }
 
     LaunchedEffect(viewModel.updateItemStockResult) {

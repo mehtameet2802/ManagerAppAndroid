@@ -43,12 +43,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.managerapp.models.Item
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
 @Composable
-fun HomeScreen(viewModel: ManagerViewModel) {
+fun HomeScreen(
+    viewModel: ManagerViewModel,
+    navController: NavController,
+    setTopBarActions: (TopBarActions) -> Unit,
+) {
 
     var sum by rememberSaveable { mutableIntStateOf(0) }
     var searchText by rememberSaveable { mutableStateOf("") }
@@ -72,6 +78,28 @@ fun HomeScreen(viewModel: ManagerViewModel) {
         user?.uid?.let { uid ->
             viewModel.getAllItems(uid)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        setTopBarActions(
+            TopBarActions(
+                onAdd = {
+                    navController.navigate("addItem")
+                },
+                onDownload = {
+                    if (allItems.isEmpty())
+                        Toast.makeText(context, "No items found", Toast.LENGTH_LONG).show()
+                    else {
+                        Toast.makeText(context, "Downloading File", Toast.LENGTH_LONG).show()
+                        viewModel.generateInventoryPdf(
+                            "Current Inventory",
+                            allItems,
+                            "CurrentInventory"
+                        )
+                    }
+                }
+            )
+        )
     }
 
     when (itemResult) {

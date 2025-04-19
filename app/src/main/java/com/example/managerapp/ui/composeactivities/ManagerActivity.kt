@@ -37,7 +37,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -53,6 +56,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.managerapp.R
 import com.example.managerapp.databinding.ActivityManagerBinding
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.ui.composescreens.AddItemScreen
 import com.example.managerapp.ui.composescreens.HomeScreen
 import com.example.managerapp.ui.composescreens.InventoryStatusScreen
@@ -230,6 +234,7 @@ fun ManagerApp(
 
     val navController = rememberNavController()
     val user by viewModel.currentUser.collectAsState()
+    val topBarActions = remember { mutableStateOf(TopBarActions()) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
@@ -254,13 +259,21 @@ fun ManagerApp(
     ) {
         Scaffold(
             topBar = {
-                ManagerTopBar(navController) {
-                    coroutineScope.launch { drawerState.open() }
-                }
+                ManagerTopBar(
+                    navController = navController,
+                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                    topBarActions = topBarActions.value
+                )
             }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                ManagerNavHost(navController, viewModel)
+                ManagerNavHost(
+                    navController = navController,
+                    viewModel = viewModel,
+                    setTopBarActions = { actions ->
+                        topBarActions.value = actions
+                    }
+                )
             }
         }
     }
@@ -331,7 +344,8 @@ fun DrawerContent(
 @Composable
 fun ManagerTopBar(
     navController: NavHostController,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    topBarActions: TopBarActions
 ) {
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -345,20 +359,55 @@ fun ManagerTopBar(
             }
         },
         actions = {
-            GetActionsForScreen(currentDestination, navController)
+            GetActionsForScreen(currentDestination, topBarActions)
         }
     )
 }
 
 @Composable
-fun ManagerNavHost(navController: NavHostController, viewModel: ManagerViewModel) {
+fun ManagerNavHost(
+    navController: NavHostController,
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit
+) {
     NavHost(navController, startDestination = "home") {
-        composable("home") { HomeScreen(viewModel = viewModel) }
-        composable("inventory") { InventoryStatusScreen(viewModel) }
-        composable("transaction") { TransactionScreen(viewModel) }
-        composable("history") { TransactionHistoryScreen(viewModel) }
-        composable("upload") { UploadFileScreen(viewModel) }
-        composable("addItem") { AddItemScreen(viewModel) }
+        composable("home") {
+            HomeScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions,
+                navController = navController
+            )
+        }
+        composable("inventory") {
+            InventoryStatusScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions
+            )
+        }
+        composable("transaction") {
+            TransactionScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions
+            )
+        }
+        composable("history") {
+            TransactionHistoryScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions
+            )
+        }
+        composable("upload") {
+            UploadFileScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions
+            )
+        }
+        composable("addItem") {
+            AddItemScreen(
+                viewModel = viewModel,
+                setTopBarActions = setTopBarActions
+            )
+        }
     }
 }
 
@@ -376,13 +425,16 @@ fun getTitleForScreen(destination: String?): String {
 }
 
 @Composable
-fun GetActionsForScreen(destination: String?, navController: NavHostController) {
+fun GetActionsForScreen(
+    destination: String?,
+    actions: TopBarActions,
+) {
     when (destination) {
         "home" -> {
-            IconButton(onClick = { navController.navigate("addItem") }) {
+            IconButton(onClick = { actions.onAdd?.invoke() }) {
                 Icon(painterResource(id = R.drawable.ic_add), contentDescription = "Add Item")
             }
-            IconButton(onClick = { /* Download functionality */ }) {
+            IconButton(onClick = { actions.onDownload?.invoke() }) {
                 Icon(painterResource(id = R.drawable.ic_download), contentDescription = "Download")
             }
         }
@@ -394,25 +446,25 @@ fun GetActionsForScreen(destination: String?, navController: NavHostController) 
 //        }
 
         "transaction" -> {
-            IconButton(onClick = { /* Clear transactions */ }) {
+            IconButton(onClick = { actions.onClear?.invoke() }) {
                 Icon(painterResource(id = R.drawable.ic_clear), contentDescription = "Clear")
             }
         }
 
         "history" -> {
-            IconButton(onClick = { /* Export history */ }) {
-                Icon(painterResource(id = R.drawable.ic_download), contentDescription = "Export")
+            IconButton(onClick = { actions.onClear?.invoke() }) {
+                Icon(painterResource(id = R.drawable.ic_clear), contentDescription = "Export")
             }
         }
 
         "upload" -> {
-            IconButton(onClick = { /* Upload file */ }) {
+            IconButton(onClick = { actions.onClear?.invoke() }) {
                 Icon(painterResource(id = R.drawable.ic_clear), contentDescription = "Upload")
             }
         }
 
         "addItem" -> {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { actions.onClear?.invoke() }) {
                 Icon(painterResource(id = R.drawable.ic_clear), contentDescription = "Close")
             }
         }

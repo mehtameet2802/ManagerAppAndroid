@@ -34,12 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
 
 @Composable
-fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
+fun TransactionHistoryScreen(
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit,
+) {
 
     var startDate by rememberSaveable { mutableStateOf("") }
     var startDateError by rememberSaveable { mutableStateOf<String?>(null) }
@@ -59,6 +63,14 @@ fun TransactionHistoryScreen(viewModel: ManagerViewModel) {
     fun clearFields() {
         startDate = ""
         endDate = ""
+    }
+
+    LaunchedEffect(Unit) {
+        setTopBarActions(
+            TopBarActions(
+                onClear = { clearFields() }
+            )
+        )
     }
 
     LaunchedEffect(viewModel.getTransactionHistoryResult) {
@@ -224,6 +236,7 @@ fun TransactionHistoryDesign(
 
             OutlinedTextField(
                 value = startDate,
+                readOnly = true,
                 onValueChange = onStartDateChange,
                 isError = startDateError != null,
                 label = { Text("Start Date") },
@@ -245,6 +258,7 @@ fun TransactionHistoryDesign(
 
             OutlinedTextField(
                 value = endDate,
+                readOnly = true,
                 onValueChange = onEndDateChange,
                 isError = endDateError != null,
                 label = { Text("End Date") },

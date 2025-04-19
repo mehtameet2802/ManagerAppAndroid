@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.managerapp.models.TopBarActions
 import com.example.managerapp.utils.Resource
 import com.example.managerapp.viewmodel.ManagerViewModel
 
@@ -132,7 +133,10 @@ import com.example.managerapp.viewmodel.ManagerViewModel
 //}
 
 @Composable
-fun InventoryStatusScreen(viewModel: ManagerViewModel) {
+fun InventoryStatusScreen(
+    viewModel: ManagerViewModel,
+    setTopBarActions: (TopBarActions) -> Unit,
+) {
 
     var isLoading by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
